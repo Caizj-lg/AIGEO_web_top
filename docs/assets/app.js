@@ -16,6 +16,11 @@ const state = {
 
 const qs = (id) => document.getElementById(id);
 
+function formatUploadBatchLabel(batch) {
+  const value = String(batch || "");
+  return value === "全部批次" ? value : `${value}（原始采集数据）`;
+}
+
 function clipText(text, limit = 68) {
   const s = String(text || "");
   return s.length <= limit ? s : `${s.slice(0, limit - 1)}…`;
@@ -137,7 +142,7 @@ function buildRankings() {
 function updateSummary(websiteRows, articleRows, totalCitations) {
   qs("summaryText").innerHTML = `统计摘要：软文 <b>${articleRows.length}</b> 篇 · 网站 <b>${websiteRows.length}</b> 个 · 总引用 <b>${totalCitations}</b> 次`;
   qs("filterState").innerHTML =
-    `当前筛选：批次 = <b>${escapeHtml(state.filters.uploadBatch)}</b>；关键词 = <b>${escapeHtml(state.filters.keyword || "无")}</b>；排序 = <b>${state.filters.sortMode === "desc" ? "按引用次数降序" : "按引用次数升序"}</b>；Top = <b>${state.filters.topN}</b>；零值网站 = <b>${state.filters.showZeroWebsites ? "显示" : "隐藏"}</b>；零值软文 = <b>${state.filters.showZeroArticles ? "显示" : "隐藏"}</b>`;
+    `当前筛选：采集数据批次 = <b>${escapeHtml(formatUploadBatchLabel(state.filters.uploadBatch))}</b>；关键词 = <b>${escapeHtml(state.filters.keyword || "无")}</b>；排序 = <b>${state.filters.sortMode === "desc" ? "按引用次数降序" : "按引用次数升序"}</b>；Top = <b>${state.filters.topN}</b>；零值网站 = <b>${state.filters.showZeroWebsites ? "显示" : "隐藏"}</b>；零值软文 = <b>${state.filters.showZeroArticles ? "显示" : "隐藏"}</b>`;
 }
 
 function render() {
@@ -297,7 +302,7 @@ async function init() {
   ["全部批次", ...(meta.upload_batches || [])].forEach((item) => {
     const option = document.createElement("option");
     option.value = item;
-    option.textContent = item;
+    option.textContent = formatUploadBatchLabel(item);
     batchSelect.appendChild(option);
   });
 
