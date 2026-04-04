@@ -116,13 +116,60 @@ body {
 .rank-table tbody tr:hover td { background: #f7fbff; }
 .num { text-align: right; white-space: nowrap; }
 .url-cell {
-  max-width: 520px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 380px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.url-copy-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.url-full {
+  min-width: 0;
+  flex: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+  line-height: 1.45;
+}
+.copy-btn {
+  flex: 0 0 auto;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: #2c2c2e;
+  font-size: 12px;
+  cursor: pointer;
+}
+.copy-btn:hover {
+  background: #f4f8ff;
+  border-color: #cbdcfb;
+}
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(28, 28, 30, 0.92);
+  color: #fff;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @media (max-width: 1100px) {
   .toolbar-row { grid-template-columns: 1fr 1fr; }
+  .url-copy-wrap { flex-direction: column; }
+  .copy-btn { align-self: flex-start; }
 }

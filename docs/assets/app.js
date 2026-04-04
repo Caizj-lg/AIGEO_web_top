@@ -29,6 +29,16 @@ function escapeHtml(text) {
     .replaceAll('"', "&quot;");
 }
 
+function buildCopyableUrlCell(raw) {
+  const safeText = escapeHtml(raw);
+  return `
+    <div class="url-copy-wrap">
+      <div class="url-full" title="${safeText}">${safeText}</div>
+      <button class="copy-btn" type="button" data-copy="${safeText}">复制</button>
+    </div>
+  `;
+}
+
 function rankTable(columns, rows, numericCols = new Set(), urlCols = new Set()) {
   const head = columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("");
   const body = rows
@@ -39,8 +49,8 @@ function rankTable(columns, rows, numericCols = new Set(), urlCols = new Set()) 
           const classes = [];
           if (numericCols.has(col)) classes.push("num");
           if (urlCols.has(col)) classes.push("url-cell");
-          const title = urlCols.has(col) ? ` title="${escapeHtml(raw)}"` : "";
-          return `<td class="${classes.join(" ")}"${title}>${escapeHtml(raw)}</td>`;
+          const content = urlCols.has(col) ? buildCopyableUrlCell(raw) : escapeHtml(raw);
+          return `<td class="${classes.join(" ")}">${content}</td>`;
         })
         .join("");
       return `<tr>${cells}</tr>`;
@@ -151,15 +161,15 @@ function render() {
     网站: row.网站,
     总引用次数: row.总引用次数,
     命中上传批次数: row.命中上传批次数,
-    URL预览: clipText(row.成功发送的URL, 78),
+    成功发送的URL: row.成功发送的URL,
     软文批次: row.软文批次,
   }));
 
   qs("articleTable").innerHTML = rankTable(
-    ["排名", "文章标题", "网站", "总引用次数", "命中上传批次数", "URL预览", "软文批次"],
+    ["排名", "文章标题", "网站", "总引用次数", "命中上传批次数", "成功发送的URL", "软文批次"],
     paged,
     new Set(["排名", "总引用次数", "命中上传批次数"]),
-    new Set(["URL预览"])
+    new Set(["成功发送的URL"])
   );
   const pageText = `第 ${state.articlePage}/${totalPages} 页 · 共 ${articleRows.length} 条`;
   qs("pageTextBottom").textContent = pageText;
@@ -170,6 +180,36 @@ function signalRefresh() {
   el.classList.remove("hidden");
   window.clearTimeout(signalRefresh.timer);
   signalRefresh.timer = window.setTimeout(() => el.classList.add("hidden"), 1000);
+}
+
+function showToast(message) {
+  const el = qs("toast");
+  el.textContent = message;
+  el.classList.add("visible");
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => el.classList.remove("visible"), 1400);
+}
+
+async function copyText(text) {
+  const value = String(text || "");
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const input = document.createElement("textarea");
+      input.value = value;
+      input.setAttribute("readonly", "");
+      input.style.position = "absolute";
+      input.style.left = "-9999px";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      document.body.removeChild(input);
+    }
+    showToast("URL 已复制");
+  } catch (error) {
+    showToast("复制失败，请重试");
+  }
 }
 
 function bindControls() {
@@ -212,6 +252,11 @@ function bindControls() {
   qs("prevPageBottom").addEventListener("click", prev);
   qs("nextPageBottom").addEventListener("click", next);
   qs("exportBtn").addEventListener("click", exportExcel);
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".copy-btn");
+    if (!button) return;
+    copyText(button.dataset.copy || "");
+  });
 }
 
 function exportExcel() {
