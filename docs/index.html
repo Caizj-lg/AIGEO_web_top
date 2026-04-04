@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>付费发文引用次数排行榜</title>
+    <link rel="stylesheet" href="./assets/style.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script defer src="./assets/app.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <h1>付费发文引用次数排行榜</h1>
+        <p>Excel 与数据库 URL 匹配后的网站/软文引用统计，可按上传批次筛选</p>
+      </section>
+
+      <section class="toolbar">
+        <div class="toolbar-row">
+          <label class="field">
+            <span>批次</span>
+            <select id="uploadBatch"></select>
+          </label>
+          <label class="field field-grow">
+            <span>搜索</span>
+            <input id="keyword" type="text" placeholder="软文批次 / 标题 / 网站 / URL" />
+          </label>
+          <label class="field">
+            <span>排序</span>
+            <select id="sortMode">
+              <option value="desc">按引用次数降序</option>
+              <option value="asc">按引用次数升序</option>
+            </select>
+          </label>
+          <label class="field field-small">
+            <span>网站 Top</span>
+            <select id="topN">
+              <option>10</option>
+              <option selected>20</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </label>
+          <button id="exportBtn" class="btn btn-primary">导出 Excel</button>
+        </div>
+        <div class="toolbar-row compact">
+          <label class="toggle"><input id="showZeroWebsites" type="checkbox" /> <span>显示零值网站</span></label>
+          <label class="toggle"><input id="showZeroArticles" type="checkbox" /> <span>显示零值软文</span></label>
+        </div>
+      </section>
+
+      <section class="summary-bar">
+        <div id="summaryText"></div>
+        <div id="filterState" class="filter-state"></div>
+        <div id="refreshHint" class="refresh-hint hidden">筛选条件已生效，排行榜已更新。</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>网站引用次数排行榜</h2>
+        </div>
+        <div id="websiteTable"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>付费发文明细排行</h2>
+          <div class="pager" id="pagerTop">
+            <button id="prevPageTop" class="btn">上一页</button>
+            <button id="nextPageTop" class="btn">下一页</button>
+            <span id="pageTextTop"></span>
+          </div>
+        </div>
+        <div id="articleTable"></div>
+        <div class="pager pager-bottom" id="pagerBottom">
+          <button id="prevPageBottom" class="btn">上一页</button>
+          <button id="nextPageBottom" class="btn">下一页</button>
+          <span id="pageTextBottom"></span>
+        </div>
+      </section>
+    </main>
+  </body>
+  </html>

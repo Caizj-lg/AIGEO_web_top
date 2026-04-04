@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+.streamlit/
+streamlit.log
+*.pyc
+*.pyo
+*.xlsx
+*.xls
+figma网站的参考/

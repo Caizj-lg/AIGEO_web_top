@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-04-04 23:31:36",
+  "source_excel": "GEO项目付费发文_260306_上线版本.xlsx",
+  "excel_raw_rows": 108,
+  "excel_valid_rows": 68,
+  "db_total_rows": 207281,
+  "match_total_rows": 320,
+  "article_total": 68,
+  "website_total": 38,
+  "upload_batches": [
+    "260109第一批",
+    "260128第一批",
+    "260128第二批",
+    "260206第一批",
+    "260224第一批",
+    "260306第一批",
+    "260326第一批"
+  ]
+}
