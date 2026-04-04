@@ -162,7 +162,6 @@ function render() {
     new Set(["URL预览"])
   );
   const pageText = `第 ${state.articlePage}/${totalPages} 页 · 共 ${articleRows.length} 条`;
-  qs("pageTextTop").textContent = pageText;
   qs("pageTextBottom").textContent = pageText;
 }
 
@@ -210,8 +209,6 @@ function bindControls() {
   });
   const prev = () => { state.articlePage -= 1; render(); };
   const next = () => { state.articlePage += 1; render(); };
-  qs("prevPageTop").addEventListener("click", prev);
-  qs("nextPageTop").addEventListener("click", next);
   qs("prevPageBottom").addEventListener("click", prev);
   qs("nextPageBottom").addEventListener("click", next);
   qs("exportBtn").addEventListener("click", exportExcel);
