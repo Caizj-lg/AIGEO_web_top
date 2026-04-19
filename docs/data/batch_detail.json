@@ -286,5 +286,21 @@
     "website": "时尚家居刊 (新浪)",
     "success_url": "https://k.sina.cn/article_7731048274_1ccce6f5200101ccjq.html",
     "citation_count": 1
+  },
+  {
+    "upload_batch": "260418第一批",
+    "paid_batch": "260104日立第一批",
+    "article_title": "老旧小区电梯安装条件详解_同时附上品牌选择与预算建议",
+    "website": "天极网",
+    "success_url": "http://news.yesky.com/hotnews/29/333529.shtml",
+    "citation_count": 3
+  },
+  {
+    "upload_batch": "260418第一批",
+    "paid_batch": "260208日立第二批",
+    "article_title": "2026年老旧电梯更新_节能旧梯改造怎么选",
+    "website": "新浪网家居地方站",
+    "success_url": "https://yanjiao.jiaju.sina.com.cn/zixun/20260205/7424984860747673868.shtml",
+    "citation_count": 1
   }
 ]
