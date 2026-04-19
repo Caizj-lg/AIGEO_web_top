@@ -16,6 +16,12 @@ const state = {
 
 const qs = (id) => document.getElementById(id);
 
+function fetchFreshJson(path) {
+  const separator = path.includes("?") ? "&" : "?";
+  const url = `${path}${separator}t=${Date.now()}`;
+  return fetch(url, { cache: "no-store" }).then((r) => r.json());
+}
+
 function formatUploadBatchLabel(batch) {
   const value = String(batch || "");
   return value === "全部批次" ? value : `${value}（原始采集数据）`;
@@ -290,9 +296,9 @@ function exportExcel() {
 
 async function init() {
   const [articles, batchDetail, meta] = await Promise.all([
-    fetch("./data/articles.json").then((r) => r.json()),
-    fetch("./data/batch_detail.json").then((r) => r.json()),
-    fetch("./data/meta.json").then((r) => r.json()),
+    fetchFreshJson("./data/articles.json"),
+    fetchFreshJson("./data/batch_detail.json"),
+    fetchFreshJson("./data/meta.json"),
   ]);
   state.articles = articles;
   state.batchDetail = batchDetail;
