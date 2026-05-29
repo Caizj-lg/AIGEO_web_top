@@ -3,7 +3,7 @@ const state = {
   batchDetail: [],
   meta: {},
   filters: {
-    uploadBatch: "全部批次",
+    uploadBatches: ["全部批次"],
     keyword: "",
     sortMode: "desc",
     topN: 20,
@@ -25,6 +25,21 @@ function fetchFreshJson(path) {
 function formatUploadBatchLabel(batch) {
   const value = String(batch || "");
   return value === "全部批次" ? value : `${value}（原始采集数据）`;
+}
+
+function selectedBatchesLabel() {
+  const selected = state.filters.uploadBatches;
+  if (selected.includes("全部批次")) return "全部批次";
+  if (!selected.length) return "未选择批次";
+  if (selected.length === 1) return formatUploadBatchLabel(selected[0]);
+  return `已选择 ${selected.length} 个批次`;
+}
+
+function selectedBatchesFullLabel() {
+  const selected = state.filters.uploadBatches;
+  if (selected.includes("全部批次")) return "全部批次";
+  if (!selected.length) return "未选择批次";
+  return selected.map(formatUploadBatchLabel).join("、");
 }
 
 function clipText(text, limit = 68) {
@@ -72,9 +87,11 @@ function rankTable(columns, rows, numericCols = new Set(), urlCols = new Set()) 
 
 function buildRankings() {
   const key = state.filters.keyword.trim().toLowerCase();
-  const uploadBatch = state.filters.uploadBatch;
+  const selectedBatches = state.filters.uploadBatches;
+  const includeAllBatches = selectedBatches.includes("全部批次");
+  const selectedBatchSet = new Set(selectedBatches);
   const filteredDetail = state.batchDetail.filter((item) => {
-    const matchBatch = uploadBatch === "全部批次" || item.upload_batch === uploadBatch;
+    const matchBatch = includeAllBatches || selectedBatchSet.has(item.upload_batch);
     const hay = [item.paid_batch, item.article_title, item.website, item.success_url].join(" ").toLowerCase();
     const matchKeyword = !key || hay.includes(key);
     return matchBatch && matchKeyword;
@@ -148,7 +165,7 @@ function buildRankings() {
 function updateSummary(websiteRows, articleRows, totalCitations) {
   qs("summaryText").innerHTML = `统计摘要：软文 <b>${articleRows.length}</b> 篇 · 网站 <b>${websiteRows.length}</b> 个 · 总引用 <b>${totalCitations}</b> 次`;
   qs("filterState").innerHTML =
-    `当前筛选：采集数据批次 = <b>${escapeHtml(formatUploadBatchLabel(state.filters.uploadBatch))}</b>；关键词 = <b>${escapeHtml(state.filters.keyword || "无")}</b>；排序 = <b>${state.filters.sortMode === "desc" ? "按引用次数降序" : "按引用次数升序"}</b>；Top = <b>${state.filters.topN}</b>；零值网站 = <b>${state.filters.showZeroWebsites ? "显示" : "隐藏"}</b>；零值软文 = <b>${state.filters.showZeroArticles ? "显示" : "隐藏"}</b>`;
+    `当前筛选：采集数据批次 = <b>${escapeHtml(selectedBatchesFullLabel())}</b>；关键词 = <b>${escapeHtml(state.filters.keyword || "无")}</b>；排序 = <b>${state.filters.sortMode === "desc" ? "按引用次数降序" : "按引用次数升序"}</b>；Top = <b>${state.filters.topN}</b>；零值网站 = <b>${state.filters.showZeroWebsites ? "显示" : "隐藏"}</b>；零值软文 = <b>${state.filters.showZeroArticles ? "显示" : "隐藏"}</b>`;
 }
 
 function render() {
@@ -224,11 +241,39 @@ async function copyText(text) {
 }
 
 function bindControls() {
-  qs("uploadBatch").addEventListener("change", (e) => {
-    state.filters.uploadBatch = e.target.value;
+  qs("uploadBatchButton").addEventListener("click", () => {
+    const menu = qs("uploadBatchMenu");
+    const isHidden = menu.classList.toggle("hidden");
+    qs("uploadBatchButton").setAttribute("aria-expanded", String(!isHidden));
+  });
+  qs("uploadBatchMenu").addEventListener("change", (e) => {
+    if (!e.target.matches('input[type="checkbox"]')) return;
+    const value = e.target.value;
+    let selected = [...state.filters.uploadBatches];
+
+    if (value === "全部批次") {
+      selected = e.target.checked ? ["全部批次"] : [];
+    } else {
+      selected = selected.filter((item) => item !== "全部批次");
+      if (e.target.checked) {
+        selected.push(value);
+      } else {
+        selected = selected.filter((item) => item !== value);
+      }
+    }
+
+    state.filters.uploadBatches = selected;
+    renderBatchMenu();
+    updateBatchButton();
     state.articlePage = 1;
     render();
     signalRefresh();
+  });
+  document.addEventListener("click", (event) => {
+    const control = qs("uploadBatchControl");
+    if (control.contains(event.target)) return;
+    qs("uploadBatchMenu").classList.add("hidden");
+    qs("uploadBatchButton").setAttribute("aria-expanded", "false");
   });
   qs("keyword").addEventListener("input", (e) => {
     state.filters.keyword = e.target.value;
@@ -270,6 +315,26 @@ function bindControls() {
   });
 }
 
+function updateBatchButton() {
+  qs("uploadBatchButton").textContent = selectedBatchesLabel();
+}
+
+function renderBatchMenu() {
+  const selected = new Set(state.filters.uploadBatches);
+  const options = ["全部批次", ...(state.meta.upload_batches || [])];
+  qs("uploadBatchMenu").innerHTML = options
+    .map((item) => {
+      const safeValue = escapeHtml(item);
+      return `
+        <label class="multi-select-option">
+          <input type="checkbox" value="${safeValue}" ${selected.has(item) ? "checked" : ""} />
+          <span>${escapeHtml(formatUploadBatchLabel(item))}</span>
+        </label>
+      `;
+    })
+    .join("");
+}
+
 function exportExcel() {
   const { websiteRows, articleRows } = buildRankings();
   const websiteExport = (state.filters.showZeroWebsites ? websiteRows : websiteRows.slice(0, state.filters.topN)).map((row) => ({
@@ -304,13 +369,8 @@ async function init() {
   state.batchDetail = batchDetail;
   state.meta = meta;
 
-  const batchSelect = qs("uploadBatch");
-  ["全部批次", ...(meta.upload_batches || [])].forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item;
-    option.textContent = formatUploadBatchLabel(item);
-    batchSelect.appendChild(option);
-  });
+  renderBatchMenu();
+  updateBatchButton();
 
   bindControls();
   render();
