@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-30 01:25:58",
+  "generated_at": "2026-08-02 11:21:48",
   "source_excel": "/Users/zack/Downloads/GEO项目付费发文_260306_上线版本.xlsx",
-  "excel_raw_rows": 108,
-  "excel_valid_rows": 96,
-  "db_total_rows": 263888,
-  "match_total_rows": 361,
-  "article_total": 96,
+  "excel_raw_rows": 128,
+  "excel_valid_rows": 111,
+  "db_total_rows": 279683,
+  "match_total_rows": 386,
+  "article_total": 111,
   "website_total": 42,
   "upload_batches": [
     "260109第一批",
@@ -18,6 +18,8 @@
     "260418第一批",
     "260419四月中旬复查成效采集数据",
     "260428四月底复查成效采集数据",
-    "260528五月底复查成效采集数据"
+    "260528五月底复查成效采集数据",
+    "260629六月底复查成效采集数据",
+    "260705日立与三菱对比采集数据"
   ]
 }
